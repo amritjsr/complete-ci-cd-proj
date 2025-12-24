@@ -1,0 +1,21 @@
+const API_BASE_URL = "http://localhost:8080/api";
+
+export async function getEmployees() {
+  const response = await fetch(`${API_BASE_URL}/employees/`);
+  return response.json();
+}
+
+export async function createEmployee(employee) {
+  const response = await fetch(`${API_BASE_URL}/employees/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(employee),
+  });
+  return response.json();
+}
+
+export async function deleteEmployee(user_name) {
+  await fetch(`${API_BASE_URL}/employees/${user_name}/update/`, {
+    method: "DELETE",
+  });
+}
