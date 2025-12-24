@@ -1,4 +1,7 @@
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL =
+  (typeof window !== "undefined" && window.__ENV && window.__ENV.REACT_APP_API_BASE_URL) ||
+  process.env.REACT_APP_API_BASE_URL ||
+  "http://localhost:8080/api";
 
 export async function getEmployees() {
   const response = await fetch(`${API_BASE_URL}/employees/`);

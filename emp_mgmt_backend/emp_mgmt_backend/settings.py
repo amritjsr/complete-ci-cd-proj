@@ -89,9 +89,11 @@ WSGI_APPLICATION = 'emp_mgmt_backend.wsgi.application'
 DB_NAME = os.getenv('DB_NAME', 'employee_db')
 DB_USER = os.getenv('DB_USER', 'emp_admin')
 DB_PASSWORD_ENCRYPTED = os.getenv('DB_PASSWORD', 'c3RyMG5nUEBzc3cwcmQK')  # Example base64 encoded password
-DB_PASSWORD = base64.b64decode(DB_PASSWORD_ENCRYPTED).decode('utf-8')
+DB_PASSWORD = base64.b64decode(DB_PASSWORD_ENCRYPTED).decode('utf-8').strip('\n')
 DB_HOST = os.getenv('DB_HOST', 'localhost')
 DB_PORT = os.getenv('DB_PORT', '3306')
+
+# print(f"Decoded DB Password: {DB_PASSWORD} || DB_HOST: {DB_HOST} || DB_PORT: {DB_PORT} || DB_USER: {DB_USER}")  # For debugging purposes only; remove in production
 
 DATABASES = {
     'default': {
