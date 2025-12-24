@@ -16,6 +16,8 @@ import base64
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=5o%z%#bij^4h7g&qgj10l2$fcc8**nrohjxxm&5t_5%#*6rb4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
 
 # Application definition
@@ -90,7 +92,7 @@ DB_NAME = os.getenv('DB_NAME', 'employee_db')
 DB_USER = os.getenv('DB_USER', 'emp_admin')
 DB_PASSWORD_ENCRYPTED = os.getenv('DB_PASSWORD', 'c3RyMG5nUEBzc3cwcmQK')  # Example base64 encoded password
 DB_PASSWORD = base64.b64decode(DB_PASSWORD_ENCRYPTED).decode('utf-8').strip('\n')
-DB_HOST = os.getenv('DB_HOST', 'localhost')
+DB_HOST = os.getenv('DB_HOST', '192.168.0.149')
 DB_PORT = os.getenv('DB_PORT', '3306')
 
 # print(f"Decoded DB Password: {DB_PASSWORD} || DB_HOST: {DB_HOST} || DB_PORT: {DB_PORT} || DB_USER: {DB_USER}")  # For debugging purposes only; remove in production
