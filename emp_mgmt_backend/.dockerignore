@@ -7,3 +7,8 @@ venv/
 .git
 node_modules
 *.log
+nohup.out
+*.sqlite3
+.DS_Store
+*.egg-info
+Dockrerfile

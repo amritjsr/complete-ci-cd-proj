@@ -22,3 +22,12 @@ export async function deleteEmployee(user_name) {
     method: "DELETE",
   });
 }
+
+export async function checkHealth() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/health/`);
+    return res.ok;
+  } catch (e) {
+    return false;
+  }
+} 

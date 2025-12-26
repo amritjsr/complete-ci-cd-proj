@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                withCredentials([string(credentialsId: 'github_token', variable: 'GHTOKEN')]) {
+                    sh '''
+                      rm -rf complete-ci-cd-proj
+                      git clone https://$GHTOKEN@github.com/amritjsr/complete-ci-cd-proj.git
+                    '''
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                sh '''
+                  cd complete-ci-cd-proj
+
+                  echo "Building FRONTEND image..."
+                  cd emp_mgmt_frontend
+                  docker build -t emp_mgmt_frontend:latest .
+                  cd ..
+
+                  echo "Building BACKEND image..."
+                  cd emp_mgmt_backend
+                  docker build -t emp_mgmt_backend:latest .
+                '''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'echo Running tests...'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'echo Deploying...'
+            }
+        }
+    }
+}
