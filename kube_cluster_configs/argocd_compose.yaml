@@ -1,0 +1,53 @@
+services:
+
+  redis:
+    image: redis:7
+    container_name: argocd-redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+
+  repo-server:
+    image: quay.io/argoproj/argocd:v3.2.2
+    container_name: argocd-repo-server
+    command: ["argocd-repo-server"]
+    volumes:
+      - ${HOME}/argocd_data:/app/config
+    depends_on:
+      - redis
+
+  application-controller:
+    image: quay.io/argoproj/argocd:v3.2.2
+    container_name: argocd-application-controller
+    command: ["argocd-application-controller"]
+    volumes:
+      - ${HOME}/argocd_data:/app/config
+    depends_on:
+      - repo-server
+      - redis
+
+  server:
+    image: quay.io/argoproj/argocd:v3.2.2
+    container_name: argocd
+    command:
+      - "argocd-server"
+      - "--namespace"
+      - "argocd"
+      - "--insecure"
+      - "--redis"
+      - "redis:6379"
+      - "--repo-server"
+      - "repo-server:8081"
+    ports:
+      - "8085:8080"
+    environment:
+      - ARGOCD_REDIS_ADDR=redis:6379
+      - ARGOCD_NAMESPACE=argocd
+      - KUBECONFIG=/home/argocd/.kube/config
+    volumes:
+      - ${HOME}/argocd_data:/app/config
+      - ${HOME}/.kube/config:/home/argocd/.kube/config:ro
+    depends_on:
+      - application-controller
+      - repo-server
+      - redis
+    restart: unless-stopped
+    

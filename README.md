@@ -80,3 +80,19 @@ In your Jenkinsfile, use the withCredentials step to access the token:
 withCredentials([string(credentialsId: 'gthub_token', variable: 'GITHUB_TOKEN')]) {
     // Use GITHUB_TOKEN in your pipeline steps
 } 
+
+
+# Run ArgoCD for Deployment as docker container outside kubernetes cluster
+At minimum, the target cluster must have:
+  namespace argocd
+  argocd-cm ConfigMap
+  argocd-rbac-cm
+  argocd-secret
+
+The easiest way is to install the Argo CD core resources in the cluster (they won’t run Pods — they only create config/state objects):
+bash````
+kubectl create namespace argocd
+kubectl apply -n argocd \
+  -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/core-install.yaml
+````
+docker compose -f kube_cluster_configs/argocd_compose.yaml up

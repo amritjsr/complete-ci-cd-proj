@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emp_mgmt_frontend_app
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: emp_mgmt_frontend_app
+  template:
+    metadata:
+      labels:
+        app: emp_mgmt_frontend_app
+    spec:
+      initContainers:
+      - name: wait-for-backend
+        image: curlimages/curl:8.6.0
+        env:
+        - name: API_HEALTH_URL
+          valueFrom:
+            configMapKeyRef:
+              name: emp-mgmt-backend-api-endpoint
+              key: API_HEALTH_URL
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "Waiting for backend at $API_HEALTH_URL ..."
+            until curl -sf "$API_HEALTH_URL"; do
+              echo "Backend not ready — retrying in 3s"
+              sleep 3
+            done
+            echo "Backend is UP — continuing startup 🎯"
+            
+      containers:
+      - name: memp_mgmt_frontend-container
+        image: amritjsr/emp_mgmt_frontend:latest 
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"

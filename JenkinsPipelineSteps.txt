@@ -31,6 +31,30 @@ pipeline {
             }
         }
 
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker_hub_token',
+                                                 usernameVariable: 'DH_USER',
+                                                 passwordVariable: 'DH_TOKEN')]) {
+
+                    sh '''
+                      echo "Logging in to Docker Hub..."
+                      echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
+
+                      echo "Tagging images..."
+                      docker tag emp_mgmt_frontend:latest $DH_USER/emp_mgmt_frontend:latest
+                      docker tag emp_mgmt_backend:latest  $DH_USER/emp_mgmt_backend:latest
+
+                      echo "Pushing images..."
+                      docker push $DH_USER/emp_mgmt_frontend:latest
+                      docker push $DH_USER/emp_mgmt_backend:latest
+
+                      docker logout
+                    '''
+                }
+            }
+        }
+
         stage('Test') {
             steps {
                 sh 'echo Running tests...'

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emp-mgmt-backend-app
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: emp-mgmt-backend-app
+  template:
+    metadata:
+      labels:
+        app: emp-mgmt-backend-app
+    spec:
+      containers:
+      - name: emp-mgmt-backend-container
+        image: amritjsr/emp_mgmt_backend:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        env:
+        # From ConfigMap
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: emp-mgmt-db-config
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: emp-mgmt-db-config
+              key: DB_USER
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: emp-mgmt-db-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: emp-mgmt-db-config
+              key: DB_PORT
+
+        # From Secret
+        - name: DB_PASSWORD_ENCRYPTED
+          valueFrom:
+            secretKeyRef:
+              name: emp-mgmt-db-secret
+              key: DB_PASSWORD_ENCRYPTED

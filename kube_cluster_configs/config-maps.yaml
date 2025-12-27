@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: emp-mgmt-backend-api-endpoint
+  namespace: default
+data:
+  API_BASE_URL: "http://emp-mgmt-backend-service:8080/api"
+  API_HEALTH_URL: "http://emp-mgmt-backend-service:8080/api/health/"
+
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: emp-mgmt-db-config
+  namespace: default
+data:
+  DB_NAME: employee_db
+  DB_USER: emp_admin
+  DB_HOST: 192.168.0.128
+  DB_PORT: "3306"
