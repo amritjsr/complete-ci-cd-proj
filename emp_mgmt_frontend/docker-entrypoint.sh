@@ -10,6 +10,9 @@ window.__ENV__ = {
 EOF
 
 # Generate Nginx config from template
-envsubst '${BACKEND_API_BASE_URL}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf
+envsubst '${BACKEND_API_BASE_URL}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+
+
+cat /etc/nginx/conf.d/default.conf
 
 exec "$@"

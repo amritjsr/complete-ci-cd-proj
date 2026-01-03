@@ -12,6 +12,10 @@ kubectl delete -f frontend-service.yaml
 sleep 5
 kubectl delete -f ingress.yaml
 sleep 5
+kubectl delete -f backend-netpol.yaml
+sleep 5
+kubectl delete -f frontend-netpol.yaml
+sleep 5
 
 kubectl apply -f config-maps.yaml
 kubectl apply -f secrets.yaml
@@ -24,4 +28,9 @@ sleep 5
 kubectl apply -f frontend-service.yaml
 sleep 5
 kubectl apply -f ingress.yaml
+sleep 5
+kubectl apply -f backend-netpol.yaml
+sleep 5
+kubectl apply -f frontend-netpol.yaml
+sleep 5
 
