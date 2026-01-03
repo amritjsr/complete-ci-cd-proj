@@ -20,3 +20,6 @@ sleep 5
 kubectl apply -f frontend-deployments.yaml
 sleep 5
 kubectl apply -f frontend-service.yaml
+sleep 5
+kubectl apply -f ingress.yaml
+

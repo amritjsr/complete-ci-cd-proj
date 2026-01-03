@@ -6,7 +6,6 @@ metadata:
 spec:
   rules:
   - host: emp-mgmt-frontend.com
-    type: LoadBalancer
     http:
       paths:
       - path: /
@@ -16,3 +15,19 @@ spec:
             name: emp-mgmt-frontend-service
             port:
               number: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: emp-mgmt-frontend-service
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: emp-mgmt-frontend-app

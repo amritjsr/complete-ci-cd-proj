@@ -1,9 +1,9 @@
-const BACKEND_API_BASE_URL =
-  (typeof window !== "undefined" && window.__ENV && window.__ENV.BACKEND_API_BASE_URL) ||
-  process.env.BACKEND_API_BASE_URL ||
-  "http://localhost:8080/api";
+// const BACKEND_API_BASE_URL =
+//   (typeof window !== "undefined" && window.__ENV && window.__ENV.BACKEND_API_BASE_URL) ||
+//   process.env.BACKEND_API_BASE_URL ||
+//   "http://localhost:8080/api";
 
-
+const BACKEND_API_BASE_URL = "/api";
 console.log(BACKEND_API_BASE_URL);
 
 export async function getEmployees() {
