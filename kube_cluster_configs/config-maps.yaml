@@ -4,7 +4,7 @@ metadata:
   name: emp-mgmt-backend-api-endpoint
   namespace: default
 data:
-  BACKEND_API_BASE_URL: "http://emp-mgmt-backend-service:8080/api"
+  BACKEND_API_BASE_URL: "/api"
   BACKEND_API_HEALTH_URL: "http://emp-mgmt-backend-service:8080/api/health/"
 
 
@@ -18,5 +18,5 @@ metadata:
 data:
   DB_NAME: employee_db
   DB_USER: emp_admin
-  DB_HOST: 192.168.0.128
+  DB_HOST: 192.168.0.149
   DB_PORT: "3306"
