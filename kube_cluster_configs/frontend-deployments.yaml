@@ -17,16 +17,16 @@ spec:
       - name: wait-for-backend
         image: curlimages/curl:8.6.0
         env:
-        - name: API_HEALTH_URL
+        - name: BACKEND_API_HEALTH_URL
           valueFrom:
             configMapKeyRef:
               name: emp-mgmt-backend-api-endpoint
-              key: API_HEALTH_URL
+              key: BACKEND_API_HEALTH_URL
         command: ["/bin/sh", "-c"]
         args:
           - |
-            echo "Waiting for backend at $API_HEALTH_URL ..."
-            until curl -sf "$API_HEALTH_URL"; do
+            echo "Waiting for backend at $BACKEND_API_HEALTH_URL ..."
+            until curl -sf "$BACKEND_API_HEALTH_URL"; do
               echo "Backend not ready — retrying in 3s"
               sleep 3
             done
@@ -38,7 +38,7 @@ spec:
         ports:
         - containerPort: 80
         env:
-        - name: API_BASE_URL
+        - name: REACT_APP_API_BASE_URL
           valueFrom:
             configMapKeyRef:
               name: emp-mgmt-backend-api-endpoint

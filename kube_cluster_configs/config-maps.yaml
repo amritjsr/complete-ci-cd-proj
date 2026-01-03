@@ -4,8 +4,8 @@ metadata:
   name: emp-mgmt-backend-api-endpoint
   namespace: default
 data:
-  API_BASE_URL: "http://emp-mgmt-backend-service:8080/api"
-  API_HEALTH_URL: "http://emp-mgmt-backend-service:8080/api/health/"
+  BACKEND_API_BASE_URL: "http://emp-mgmt-backend-service:8080/api"
+  BACKEND_API_HEALTH_URL: "http://emp-mgmt-backend-service:8080/api/health/"
 
 
 ---
