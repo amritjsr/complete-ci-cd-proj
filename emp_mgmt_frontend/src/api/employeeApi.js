@@ -1,7 +1,7 @@
 const BACKEND_API_BASE_URL =
   (typeof window !== "undefined" && window.__ENV && window.__ENV.BACKEND_API_BASE_URL) ||
   process.env.BACKEND_API_BASE_URL ||
-  "http://emp-mgmt-backend-service:8080/api";
+  "http://localhost:8080/api";
 
 
 console.log(BACKEND_API_BASE_URL);

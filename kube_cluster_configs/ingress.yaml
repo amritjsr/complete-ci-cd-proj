@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: emp-mgmt-frontend-ingress
+  namespace: default
+spec:
+  rules:
+  - host: emp-mgmt-frontend.com
+    type: LoadBalancer
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: emp-mgmt-frontend-service
+            port:
+              number: 80
