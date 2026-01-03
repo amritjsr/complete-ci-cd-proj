@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: emp_mgmt_frontend_app
+  name: emp-mgmt-frontend-app
   namespace: default
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: emp_mgmt_frontend_app
+      app: emp-mgmt-frontend-app
   template:
     metadata:
       labels:
-        app: emp_mgmt_frontend_app
+        app: emp-mgmt-frontend-app
     spec:
       initContainers:
       - name: wait-for-backend
@@ -33,14 +33,20 @@ spec:
             echo "Backend is UP — continuing startup 🎯"
             
       containers:
-      - name: memp_mgmt_frontend-container
+      - name: emp-mgmt-frontend-container
         image: amritjsr/emp_mgmt_frontend:latest 
         ports:
         - containerPort: 80
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "250m"
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
+        env:
+        - name: API_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: emp-mgmt-backend-api-endpoint
+              key: API_BASE_URL
+        # resources:
+        #   requests:
+        #     memory: "128Mi"
+        #     cpu: "250m"
+        #   limits:
+        #     memory: "256Mi"
+        #     cpu: "500m"

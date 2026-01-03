@@ -18,13 +18,13 @@ spec:
         image: amritjsr/emp_mgmt_backend:latest
         ports:
         - containerPort: 8080
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "250m"
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
+        # resources:
+        #   requests:
+        #     memory: "128Mi"
+        #     cpu: "75m"
+        #   limits:
+        #     memory: "256Mi"
+        #     cpu: "250m"
         env:
         # From ConfigMap
         - name: DB_NAME
@@ -52,5 +52,5 @@ spec:
         - name: DB_PASSWORD_ENCRYPTED
           valueFrom:
             secretKeyRef:
-              name: emp-mgmt-db-secret
+              name: emp-mgmt-db-password
               key: DB_PASSWORD_ENCRYPTED
