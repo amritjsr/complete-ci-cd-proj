@@ -38,11 +38,11 @@ spec:
         ports:
         - containerPort: 80
         env:
-        - name: BACKEND_API_BASE_URL
+        - name: BACKEND_API_BASE_URI
           valueFrom:
             configMapKeyRef:
               name: emp-mgmt-backend-api-endpoint
-              key: BACKEND_API_BASE_URL
+              key: BACKEND_API_BASE_URI
         - name: BACKEND_SERVICE_URL
           valueFrom:
             configMapKeyRef:
