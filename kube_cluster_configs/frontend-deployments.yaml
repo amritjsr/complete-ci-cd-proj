@@ -38,11 +38,11 @@ spec:
         ports:
         - containerPort: 80
         env:
-        - name: REACT_APP_API_BASE_URL
+        - name: BACKEND_API_BASE_URL
           valueFrom:
             configMapKeyRef:
               name: emp-mgmt-backend-api-endpoint
-              key: API_BASE_URL
+              key: BACKEND_API_BASE_URL
         # resources:
         #   requests:
         #     memory: "128Mi"
