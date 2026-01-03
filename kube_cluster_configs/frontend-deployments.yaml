@@ -43,6 +43,11 @@ spec:
             configMapKeyRef:
               name: emp-mgmt-backend-api-endpoint
               key: BACKEND_API_BASE_URL
+        - name: BACKEND_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: emp-mgmt-backend-api-endpoint
+              key: BACKEND_SERVICE_URL
         # resources:
         #   requests:
         #     memory: "128Mi"

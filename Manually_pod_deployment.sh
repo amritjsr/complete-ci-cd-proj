@@ -9,7 +9,9 @@ sleep 5
 kubectl delete -f backend-services.yaml
 sleep 5
 kubectl delete -f frontend-service.yaml
-sleep 10
+sleep 5
+kubectl delete -f ingress.yaml
+sleep 5
 
 kubectl apply -f config-maps.yaml
 kubectl apply -f secrets.yaml
