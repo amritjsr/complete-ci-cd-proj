@@ -9,14 +9,32 @@ spec:
       app: emp-mgmt-backend-app
   policyTypes:
   - Ingress
-  - Egress
   ingress:
   - from:
     - podSelector:
         matchLabels:
           app: emp-mgmt-frontend-app
-  egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          app: emp-mgmt-frontend-app
+  # egress:
+  # # Allow connecting to Frontend (if needed, though usually backend responds to established connections)
+  # - to:
+  #   - podSelector:
+  #       matchLabels:
+  #         app: emp-mgmt-frontend-app
+  # # Allow connecting to External Database
+  # - to:
+  #   - ipBlock:
+  #       cidr: 192.168.0.149/32
+  #   ports:
+  #   - protocol: TCP
+  #     port: 3306
+  # # Allow DNS Resolution (Critical!)
+  # - to:
+  #   - namespaceSelector: {}
+  #     podSelector:
+  #       matchLabels:
+  #         k8s-app: kube-dns
+  #   ports:
+  #   - protocol: UDP
+  #     port: 53
+  #   - protocol: TCP
+  #     port: 53

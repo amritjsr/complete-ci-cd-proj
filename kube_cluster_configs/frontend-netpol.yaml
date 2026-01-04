@@ -11,12 +11,30 @@ spec:
   - Ingress
   - Egress
   ingress:
+  # Allow Traffic from the Internet (LoadBalancer) on Port 80
   - from:
-    - podSelector:
-        matchLabels:
-          app: emp-mgmt-backend-app
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:
+    - protocol: TCP
+      port: 80
   egress:
+  # Allow Talking to Backend
   - to:
     - podSelector:
         matchLabels:
           app: emp-mgmt-backend-app
+    ports:
+    - protocol: TCP
+      port: 8080
+  # Allow DNS Resolution (Essential!)
+  - to:
+    - namespaceSelector: {}
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
