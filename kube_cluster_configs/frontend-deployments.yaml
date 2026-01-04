@@ -4,7 +4,7 @@ metadata:
   name: emp-mgmt-frontend-app
   namespace: default
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: emp-mgmt-frontend-app
@@ -48,6 +48,11 @@ spec:
             configMapKeyRef:
               name: emp-mgmt-backend-api-endpoint
               key: BACKEND_SERVICE_URL
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: emp-mgmt-frontend-app
         # resources:
         #   requests:
         #     memory: "128Mi"

@@ -4,7 +4,7 @@ metadata:
   name: emp-mgmt-backend-app
   namespace: default
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: emp-mgmt-backend-app
@@ -54,3 +54,8 @@ spec:
             secretKeyRef:
               name: emp-mgmt-db-password
               key: DB_PASSWORD_ENCRYPTED
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: emp-mgmt-backend-app
