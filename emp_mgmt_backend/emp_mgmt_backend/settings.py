@@ -170,21 +170,26 @@ LOGGING = {
             "stream": sys.stdout,
             "formatter": "standard",
         },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "/app/logs/django.log",
+            "formatter": "standard",
+        },
     },
 
     "root": {  # Catch everything
-        "handlers": ["console"],
+        "handlers": ["console", "file"],
         "level": LOG_LEVEL,
     },
 
     "loggers": {
         "django": {   # Django framework logs
-            "handlers": ["console"],
+            "handlers": ["console", "file"],
             "level": LOG_LEVEL,
             "propagate": False,
         },
         "employees": {  # your app logs
-            "handlers": ["console"],
+            "handlers": ["console", "file"],
             "level": LOG_LEVEL,
             "propagate": False,
         },

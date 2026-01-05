@@ -13,11 +13,21 @@ spec:
       labels:
         app: emp-mgmt-backend-app
     spec:
+      initContainers:
+      - name: init-logs-permission
+        image: busybox
+        command: ["sh", "-c", "mkdir -p /app/logs && chmod 777 /app/logs"]
+        volumeMounts:
+        - name: backend-logs-vol
+          mountPath: /app/logs
       containers:
       - name: emp-mgmt-backend-container
         image: amritjsr/emp_mgmt_backend:latest
         ports:
         - containerPort: 8080
+        volumeMounts:
+        - name: backend-logs-vol
+          mountPath: /app/logs
         # resources:
         #   requests:
         #     memory: "128Mi"
@@ -54,8 +64,23 @@ spec:
             secretKeyRef:
               name: emp-mgmt-db-password
               key: DB_PASSWORD_ENCRYPTED
-        podAntiAffinity:
+      - name: promtail-sidecar
+        image: grafana/promtail:latest
+        args: ["-config.file=/etc/promtail/promtail.yaml"]
+        volumeMounts:
+        - name: backend-logs-vol
+          mountPath: /app/logs
+        - name: promtail-config-vol
+          mountPath: /etc/promtail
+      podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchLabels:
                 app: emp-mgmt-backend-app
+      volumes:
+      - name: backend-logs-vol
+        persistentVolumeClaim:
+          claimName: backend-logs-pvc
+      - name: promtail-config-vol
+        configMap:
+          name: promtail-sidecar-config
