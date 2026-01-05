@@ -13,10 +13,17 @@ spec:
       labels:
         app: emp-mgmt-backend-app
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: emp-mgmt-backend-app
+            topologyKey: kubernetes.io/hostname
       initContainers:
       - name: init-logs-permission
         image: busybox
-        command: ["sh", "-c", "mkdir -p /app/logs && chmod 777 /app/logs"]
+        command: ["sh", "-c", "mkdir -p /app/logs && chmod 777 /app/logs && touch /app/logs/django.log && chmod 666 /app/logs/django.log"]
         volumeMounts:
         - name: backend-logs-vol
           mountPath: /app/logs
@@ -28,13 +35,6 @@ spec:
         volumeMounts:
         - name: backend-logs-vol
           mountPath: /app/logs
-        # resources:
-        #   requests:
-        #     memory: "128Mi"
-        #     cpu: "75m"
-        #   limits:
-        #     memory: "256Mi"
-        #     cpu: "250m"
         env:
         # From ConfigMap
         - name: DB_NAME
@@ -72,11 +72,6 @@ spec:
           mountPath: /app/logs
         - name: promtail-config-vol
           mountPath: /etc/promtail
-      podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchLabels:
-                app: emp-mgmt-backend-app
       volumes:
       - name: backend-logs-vol
         persistentVolumeClaim:
