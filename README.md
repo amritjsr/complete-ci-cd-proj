@@ -1,98 +1,147 @@
-# This is README file for Employee Management Application
-# Description:
-This application consists of a backend built with Django REST Framework and a frontend built with React. The backend provides RESTful APIs for managing employee data, while the frontend offers a user-friendly interface to interact with these APIs.
-And Backend use MySQL as database. This MYSQL database is expected to be running separately and accessible to the backend service.
+# Employee Management Application (CI/CD Project)
 
+This project is a full-stack Employee Management System designed to demonstrate a complete CI/CD pipeline and cloud-native observability stack.
 
-# How to build Backend Docker Image
-# Employee Management Backend Docker Build Instructions
-bash````
-$ cd emp_mgmt_backend
-$ docker build . -t emp_mgmt_backend:0.1
-```` 
-# Frontend Docker build Instructions
-bash````
-$ cd ../emp_mgmt_frontend
-$ docker build . -t emp_mgmt_frontend:0.1
-````
-# How to run Backend and Frontend Docker Containers
+## � Cluster Setup & Topology
+This application is designed to run on a **Multi-Node Kubernetes Cluster**.
 
-# Employee Management Backend Docker Run Instructions
+*   **Control Plane (Master)**: Manages the cluster state.
+*   **Worker Nodes (k8s-w1 to k8s-w4)**: Run the application workloads.
+    *   **Operating System**: Linux (Ubuntu 24.04 recommended)
+    *   **Container Runtime**: Docker / Containerd
+    *   **Networking**: Calico / Flannel CNI
+    *   **Load Balancer**: MetalLB (Layer 2 Mode)
 
-export DB_NAME='employee_db'
-export DB_USER='emp_admin'
-export DB_PASSWORD_ENCRYPTED='base464encodedpassword=='
-export DB_HOST='192.168.0.199'
-export DB_PORT='3306'
+## �🏗 Logical Architecture
+*   **Frontend**: React (served via Nginx)
+*   **Backend**: Django REST Framework (Python)
+*   **Database**: MySQL (External or Kubernetes-hosted)
+*   **Observability**: Loki (Logs), Promtail (Log Shipping), Grafana (Visualization)
+*   **Orchestration**: Kubernetes (K8s)
 
-docker rm -f employee_db_container
-docker run \
-  --name employee_db_container \
-  -e DB_NAME=$DB_NAME \
-  -e DB_USER=$DB_USER \
-  -e DB_PASSWORD_ENCRYPTED=$DB_PASSWORD_ENCRYPTED \
-  -e DB_HOST=$DB_HOST \
-  -e DB_PORT=$DB_PORT \
-  -p 8080:8080 \
-  emp_mgmt_backend:0.1
+## 🚀 Prerequisites
+*   Docker
+*   Kubernetes Cluster (Minikube, Kind, or Bare-metal)
+*   `kubectl` CLI
 
+---
 
-# Employee Management Frontend Docker Run Instructions
-export REACT_APP_API_BASE_URL=http://localhost:8080/api
+## 🛠 Kubernetes Deployment Guide
+
+All Kubernetes manifests are located in the `kube_cluster_configs/` directory.
+
+### 1. Setup Secrets & Configuration
+**Crucial Step**: You must configure your Database connection details before deploying.
+
+**A. Edit `kube_cluster_configs/config-maps.yaml`**:
+Update the `DB_HOST` to point to your MySQL server IP.
+```yaml
+data:
+  DB_HOST: "192.168.1.100" # <--- Change this to your MySQL IP
+  DB_NAME: "employee_db"   # Your Database Name
+  DB_USER: "emp_admin"     # Your Database User
+```
+
+**B. Edit `kube_cluster_configs/secrets.yaml`**:
+You must provide your database password in **Base64 Encoded** format.
+1.  Generate the encoded password:
+    ```bash
+    echo -n 'your-real-password' | base64
+    ```
+2.  Update the file:
+    ```yaml
+    data:
+      DB_PASSWORD_ENCRYPTED: "cjNMs..." # <--- Paste the Output here
+    ```
+
+**C. Apply the Configs**:
+```bash
+kubectl apply -f kube_cluster_configs/secrets.yaml
+kubectl apply -f kube_cluster_configs/config-maps.yaml
+```
+
+### 2. Setup Storage & Logging Stack (The "OLG" Stack)
+This project uses **Loki** for persistent log aggregation.
+*   **Storage**: A specific `PersistentVolume` is required for the log files.
+*   **Provisioner**: If using a dynamic cluster, apply the `storage-class.yaml`. If manual, ensure `backend-log-pv.yaml` matches your node name.
+
+**Important Manual Steps**:
+1.  **Prepare Worker Nodes**: You must manually create the directory on **ALL** worker nodes.
+    ```bash
+    # Run this on every worker node (k8s-w1, k8s-w2, etc.)
+    sudo mkdir -p /tmp/backend-logs
+    sudo chmod 777 /tmp/backend-logs
+    ```
+2.  **Update Manifest**: Open `kube_cluster_configs/backend-log-pv.yaml`.
+    *   Find the `nodeAffinity` section.
+    *   Update the `values` list to include **your specific worker node hostnames** (e.g., `k8s-w1`, `k8s-w2`, ...).
+
+```bash
+# 1. Apply Persistent Log Volume
+kubectl apply -f kube_cluster_configs/backend-log-pv.yaml
+kubectl apply -f kube_cluster_configs/backend-log-pvc.yaml
+
+# 2. Deploy Loki & Grafana
+kubectl apply -f kube_cluster_configs/loki-infra.yaml
+
+# 3. Deploy Promtail Sidecar Config
+kubectl apply -f kube_cluster_configs/promtail-config.yaml
+```
+
+### 3. Deploy Applications
+Deploy the backend (with simple init-containers for log permission) and frontend.
+```bash
+# Backend (Django + Promtail Sidecar)
+kubectl apply -f kube_cluster_configs/backend-deployment.yaml
+kubectl apply -f kube_cluster_configs/backend-services.yaml
+
+# Frontend (React + Nginx)
+kubectl apply -f kube_cluster_configs/frontend-deployments.yaml
+kubectl apply -f kube_cluster_configs/frontend-service.yaml
+kubectl apply -f kube_cluster_configs/ingress.yaml
+```
+
+---
+
+## 📊 Observability (How to check logs)
+
+Instead of `kubectl logs`, use **Grafana** to search persistent logs.
+
+1.  **Access Grafana**:
+    *   URL: `http://<NodeIP>:32000` (NodePort)
+    *   **User**: `admin` / **Password**: `admin` (change on first login)
+
+2.  **Setup Data Source** (First time only):
+    *   Go to **Configuration** -> **Data Sources** -> **Add Data Source**.
+    *   Select **Loki**.
+    *   URL: `http://loki:3100`
+
+3.  **Search Logs**:
+    *   Go to **Explore**.
+    *   Query: `{job="emp-mgmt-backend"}` to see all backend logs.
+    *   Query: `{job="emp-mgmt-backend"} |= "ERROR"` to find errors.
+
+---
+
+## 🐳 Manual Docker Build & Run
+If you want to run without Kubernetes:
+
+**Backend**:
+```bash
+cd emp_mgmt_backend
+docker build -t emp_mgmt_backend:0.1 .
+docker run -p 8080:8080 emp_mgmt_backend:0.1
+```
+
+**Frontend**:
+```bash
+cd emp_mgmt_frontend
+docker build -t emp_mgmt_frontend:0.1 .
 docker run -p 8081:80 emp_mgmt_frontend:0.1
+```
 
+---
 
-# Jenkins Pipeline Setup Instructions
-1. Ensure Docker is installed and running on the Jenkins server.
-2. Create a directory on the host machine to persist Jenkins data:
-   mkdir -p $HOME/jenkins_home
-3. Use the provided Jenkins_Compose.yaml file to set up the Jenkins container with Docker-in-Docker capabilities.
-4. Start the Jenkins container using Docker Compose:
-   docker-compose -f Jenkins_Compose.yaml up -d
-5. Access Jenkins at http://localhost:8080 and complete the initial setup.
-
-
-# Setting up GitHub Personal Access Token for Jenkins
-✅ Step-1 — Create a GitHub Personal Access Token
-
-On GitHub:
-Go to Settings → Developer settings → Personal access tokens
-Click Generate new token (classic or fine-grained)
-Give permissions like:
-repo
-Copy the token (you’ll need it only once)
-
-# Adding Credentials to Jenkins
-✅ Step-2 — Add the token to Jenkins Credentials
-
-Open Jenkins → Manage Jenkins → Credentials
-Choose System → Global credentials
-Click Add Credentials
-Select type → Secret text
-Paste your GitHub token
-Give an ID (example: gthub_token)
-Save
-
-
-# Using the Token in Jenkins Pipeline
-✅ Step-3 — Use the token in your Jenkins Pipeline
-In your Jenkinsfile, use the withCredentials step to access the token:
-withCredentials([string(credentialsId: 'gthub_token', variable: 'GITHUB_TOKEN')]) {
-    // Use GITHUB_TOKEN in your pipeline steps
-} 
-
-
-# Run ArgoCD for Deployment as docker container outside kubernetes cluster
-At minimum, the target cluster must have:
-  namespace argocd
-  argocd-cm ConfigMap
-  argocd-rbac-cm
-  argocd-secret
-
-The easiest way is to install the Argo CD core resources in the cluster (they won’t run Pods — they only create config/state objects):
-bash````
-kubectl create namespace argocd
-kubectl apply -n argocd \
-  -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/core-install.yaml
-````
-docker compose -f kube_cluster_configs/argocd_compose.yaml up
+## ⚙️ Jenkins & ArgoCD
+*   **Jenkins**: Used for CI. See `Jenkins_Compose.yaml` and `JenkinsPipelineSteps.txt`.
+*   **ArgoCD**: Used for GitOps deployment. See `kube_cluster_configs/argocd_compose.yaml`.
