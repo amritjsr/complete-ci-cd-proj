@@ -143,5 +143,29 @@ docker run -p 8081:80 emp_mgmt_frontend:0.1
 ---
 
 ## ⚙️ Jenkins & ArgoCD
-*   **Jenkins**: Used for CI. See `Jenkins_Compose.yaml` and `JenkinsPipelineSteps.txt`.
-*   **ArgoCD**: Used for GitOps deployment. See `kube_cluster_configs/argocd_compose.yaml`.
+
+### 1. Jenkins (CI - Building Images)
+We use Jenkins running in a Docker container to build our application images. It utilizes the host's Docker daemon (Socket Binding) to build images.
+
+**How to Start Jenkins**:
+1.  Create the persistence directory:
+    ```bash
+    mkdir -p ~/jenkins_home
+    ```
+2.  Start the container:
+    ```bash
+    docker compose -f Jenkins_Compose.yaml up -d
+    ```
+3.  **Access**: `http://localhost:8080`
+4.  **Setup**: Follow the on-screen instructions (Unlock Jenkins using the initialAdminPassword from `docker logs jenkins`).
+
+*   **ArgoCD**: Used for GitOps deployment.
+
+### Installing ArgoCD (In-Cluster)
+If you are running ArgoCD inside the Kubernetes cluster:
+```bash
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+*   **Note**: This installs ArgoCD resources into the `argocd` namespace.
+*   **Alternative**: See `kube_cluster_configs/argocd_compose.yaml` for a Docker Compose version.
