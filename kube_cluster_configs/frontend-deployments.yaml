@@ -13,6 +13,13 @@ spec:
       labels:
         app: emp-mgmt-frontend-app
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: emp-mgmt-frontend-app
+            topologyKey: kubernetes.io/hostname
       initContainers:
       - name: wait-for-backend
         image: curlimages/curl:8.6.0
@@ -48,11 +55,7 @@ spec:
             configMapKeyRef:
               name: emp-mgmt-backend-api-endpoint
               key: BACKEND_SERVICE_URL
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchLabels:
-                app: emp-mgmt-frontend-app
+        
         # resources:
         #   requests:
         #     memory: "128Mi"
